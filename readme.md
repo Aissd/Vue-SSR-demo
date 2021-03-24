@@ -4,7 +4,7 @@
 npm init -y
 ```
 
-##### 2、安装vue以及vue服务端渲染核心
+##### 2、安装vue以及vue服务端渲染工具 
 ```
 npm install vue vue-server-renderer --save
 ```
