@@ -1,9 +1,10 @@
+const fs = require('fs');
 // 在node上运行，所以使用common.js
 const Vue = require('vue');
 // 返回的是一个函数，直接执行
 const server = require('express')();
 // 服务端渲染器
-const renderer = require('vue-server-renderer').createRenderer();
+const VueServerRenderer = require('vue-server-renderer');
 
 // 所有的get请求都经过该服务器
 server.get('*', (req, res) => {
@@ -15,21 +16,30 @@ server.get('*', (req, res) => {
         // 读取vue的data属性
         template: '<div>Hello Vue SSR! - {{ url }}</div>'
     });
+
+    const context = {
+        title: 'Vue SSR',
+        metas: `
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="keyword" content="vue,ssr">
+            <meta name="description" content="vue ssr demo">
+        `
+    };
+    
+    const template = fs.readFileSync('./index.template.html', 'utf-8');
+    const renderer = VueServerRenderer.createRenderer({
+        template
+    });
     // app 是vue实例
     // html是hrml字符串
-    renderer.renderToString(app, (err, html) => {
+    renderer.renderToString(app, context, (err, html) => {
         if (err) {
             res.status(500).end('internal server error');
             return;
         };
-        res.end(`
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <title>Hello SSR</title>
-                    <body>${html}</body>
-            </html>
-        `)
+        res.end(html);
     });
 });
     
